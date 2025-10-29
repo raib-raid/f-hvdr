@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>موسوعة البطاريق | نسخة متقدمة جداً</title>
+  <meta name="description" content="موقع ويب أحادي الملف عن جميع أنواع البطاريق + بطريق زنجباري مؤيّد. بحث، تصفية، مخطط، خريطة، معرض، اختبار تفاعلي، وضع ليلي، وصولية." />
+  <style>
+    /* ========================
+       نظام تصميم بسيط (CSS)
+       ======================== */
+    :root {
+      --bg: #0b1320;
+      --panel: #121a2b;
+      --panel-2: #0f1626;
+      --text: #f2f5ff;
+      --muted: #c6cbe0;
+      --brand: #6cc4ff;
+      --brand-2: #00d0ff;
+      --accent: #ffb703;
+      --danger: #ff6b6b;
+      --ok: #13ce66;
+      --radius: 18px;
+      --radius-sm: 12px;
+      --shadow: 0 10px 35px rgba(0,0,0,.25), 0 2px 6px rgba(0,0,0,.2);
+      --grid-gap: 18px;
+      --maxw: 1280px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); margin: 0; }
+    .wrap { max-width: var(--maxw); margin: auto; padding: 22px; }
+    header.site {
+      position: sticky; top: 0; z-index: 50; backdrop-filter: blur(8px);
+      background: linear-gradient(180deg, rgba(11,19,32,.9), rgba(11,19,32,.5));
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .hero {
+      display: grid; grid-template-columns: 1.2fr .8fr; gap: var(--grid-gap);
+      padding: 22px 0; align-items: center;
+    }
+    .card { background: linear-gradient(180deg, var(--panel), var(--panel-2)); border: 1px solid rgba(255,255,255,.08); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .card.pad { padding: 18px; }
+    .title { font-size: clamp(26px, 3vw, 44px); margin: 0 0 6px; letter-spacing: .3px; }
+    .sub { color: var(--muted); margin: 0; }
+    .bar { display: flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+    .input, .select, .btn {
+      background: #0d172a; color: var(--text); border: 1px solid rgba(255,255,255,.1);
+      border-radius: var(--radius-sm); padding: 12px 14px; outline: none; font-size: 14px;
+    }
+    .btn { cursor: pointer; transition: .2s transform, .2s background; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.brand { background: linear-gradient(90deg, var(--brand), var(--brand-2)); color: #001018; border: none; font-weight: 700; letter-spacing: .3px; }
+    .btn.ghost { background: transparent; border: 1px dashed rgba(255,255,255,.18); }
+
+    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--grid-gap); }
+    .col-12 { grid-column: span 12; }
+    .col-8 { grid-column: span 8; }
+    .col-7 { grid-column: span 7; }
+    .col-6 { grid-column: span 6; }
+    .col-5 { grid-column: span 5; }
+    .col-4 { grid-column: span 4; }
+    .col-3 { grid-column: span 3; }
+
+    @media (max-width: 980px){
+      .hero { grid-template-columns: 1fr; }
+      .col-8, .col-7, .col-6, .col-5, .col-4, .col-3 { grid-column: span 12; }
+    }
+
+    .species-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--grid-gap); }
+    .species-card { position: relative; overflow: hidden; }
+    .species-card .thumb { height: 180px; background: #0e223a; display: grid; place-items: center; }
+    .chip { display: inline-flex; gap: 8px; align-items: center; background: rgba(255,255,255,.06); padding: 6px 10px; border-radius: 999px; font-size: 12px; color: var(--muted); }
+    .chip .dot { width: 8px; height: 8px; border-radius: 999px; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--grid-gap); }
+    .kp { padding: 14px; border-radius: var(--radius-sm); background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); }
+    .kp b { font-size: 22px; }
+
+    .section-title { font-size: 22px; margin: 0 0 10px; }
+    .muted { color: var(--muted); }
+
+    /* رسم خريطة SVG مبسطة للعالم */
+    svg.map { width: 100%; height: auto; display: block; }
+    .region { fill: #123; stroke: #234; stroke-width: .6; }
+    .region[data-hot="1"] { fill: #1a3455; }
+    .pin { fill: var(--accent); stroke: #000; stroke-width: .3; opacity: .8; }
+
+    /* نافذة منبثقة */
+    dialog.modal { border: none; border-radius: 18px; padding: 0; background: transparent; }
+    .modal .sheet { background: linear-gradient(180deg, var(--panel), var(--panel-2)); color: var(--text); border-radius: 18px; box-shadow: var(--shadow); width: min(840px, 94vw); overflow: hidden; }
+    .modal .sheet header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .modal .content { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
+    @media (max-width: 900px){ .modal .content { grid-template-columns: 1fr; } }
+
+    /* جدول */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 12px; border-bottom: 1px dashed rgba(255,255,255,.12); text-align: right; }
+    th { color: var(--muted); font-weight: 600; letter-spacing: .2px; }
+
+    /* رسم بياني SVG بسيط */
+    .chart { width: 100%; height: 180px; background: rgba(255,255,255,.04); border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,.08); }
+
+    /* تبويبات */
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tab { padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.06); cursor: pointer; border: 1px solid transparent; user-select: none; }
+    .tab[aria-selected="true"] { background: linear-gradient(90deg, var(--brand), var(--brand-2)); color: #001018; border-color: rgba(0,0,0,.15); font-weight: 700; }
+
+    /* منطقة الاختبار */
+    .quiz-q { padding: 14px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04); }
+    .quiz-q h4 { margin: 0 0 6px; }
+
+    footer.site { margin-top: 40px; border-top: 1px solid rgba(255,255,255,.08); padding: 16px 0 40px; color: var(--muted); }
+
+    /* زر العودة للأعلى */
+    .to-top { position: fixed; bottom: 18px; left: 18px; z-index: 60; display: none; }
+    .to-top.show { display: block; }
+  </style>
+</head>
+<body>
+  <header class="site">
+    <div class="wrap">
+      <div class="hero">
+        <div class="card pad">
+          <h1 class="title">موسوعة البطاريق <span aria-hidden>🐧</span></h1>
+          <p class="sub">دليل تفاعلي شامل لأنواع البطاريق حول العالم مع صور SVG مُضمّنة، وخرائط انتشار، وجدول مقارن، واختبار سريع. يتضمن نوعاً خيالياً: <b>البطريق الزنجباري (مؤيّد)</b> ✨.</p>
+          <div class="bar">
+            <input class="input" id="q" placeholder="ابحث باسم النوع، الموطن، أو السلوك…" />
+            <select class="select" id="filterRegion" title="تصفية حسب القارة">
+              <option value="">كل المناطق</option>
+              <option>أنتاركتيكا</option>
+              <option>أوقيانوسيا</option>
+              <option>أمريكا الجنوبية</option>
+              <option>أفريقيا</option>
+              <option>المحيط الهندي</option>
+            </select>
+            <select class="select" id="filterSize" title="تصفية حسب الحجم">
+              <option value="">كل الأحجام</option>
+              <option value="صغير">صغير</option>
+              <option value="متوسط">متوسط</option>
+              <option value="كبير">كبير</option>
+            </select>
+            <button class="btn brand" id="downloadJson">تنزيل البيانات JSON</button>
+            <button class="btn ghost" id="themeBtn" aria-pressed="false">الوضع الليلي</button>
+          </div>
+        </div>
+        <div class="card pad">
+          <div class="kpis">
+            <div class="kp"><div class="muted">إجمالي الأنواع</div><b id="kTotal">—</b></div>
+            <div class="kp"><div class="muted">مهدد بالانقراض</div><b id="kThreat">—</b></div>
+            <div class="kp"><div class="muted">متوسط الطول</div><b id="kAvgH">—</b></div>
+            <div class="kp"><div class="muted">متوسط الوزن</div><b id="kAvgW">—</b></div>
+          </div>
+          <div class="bar" style="margin-top:14px">
+            <div class="chip" title="عدد البطاقات المعروضة"><span class="dot" style="background:var(--accent)"></span><span id="chipCount">—</span></div>
+            <div class="chip" title="نتائج البحث"><span class="dot" style="background:var(--brand)"></span><span id="chipSearch">—</span></div>
+            <div class="chip" title="التصفية الحالية"><span class="dot" style="background:#9ae6b4"></span><span id="chipFilter">لا يوجد</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="grid">
+      <div class="col-8">
+        <div class="card pad">
+          <div class="tabs" role="tablist" aria-label="أقسام المحتوى">
+            <button class="tab" role="tab" aria-selected="true" data-tab="gallery">المعرض</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="table">الجدول</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="map">الخريطة</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="quiz">اختبر معلوماتك</button>
+          </div>
+          <div id="panels" style="margin-top: 16px">
+            <section id="panel-gallery" role="tabpanel">
+              <div class="species-grid" id="grid"></div>
+            </section>
+            <section id="panel-table" role="tabpanel" hidden>
+              <div class="muted" style="margin-bottom:8px">قابلة للفرز بالنقر على العناوين.</div>
+              <div style="overflow:auto"><table id="tbl"></table></div>
+            </section>
+            <section id="panel-map" role="tabpanel" hidden>
+              <div class="muted" style="margin-bottom:8px">خريطة توضيحية لمناطق الانتشار (تقريبية).</div>
+              <svg class="map" viewBox="0 0 1200 520" aria-label="خريطة العالم">
+                <rect width="1200" height="520" fill="#0b1a2c" rx="18" ry="18" />
+                <!-- أشكال قارات مبسطة -->
+                <path class="region" d="M180 120l220-20 80 60-30 80-120 40-150-60z"/>
+                <path class="region" d="M480 130l110-30 140 30 50 50-80 40-120-20z"/>
+                <path class="region" d="M850 150l180-20 60 50-20 60-180 40-40-30z"/>
+                <path class="region" d="M540 350l160 20 60 40-60 50-170 10-40-50z"/>
+                <!-- أوقيانوسيا -->
+                <path class="region" data-hot="1" d="M970 400l80 0 40 20-20 30-70 10-40-15z"/>
+                <!-- دبابيس انتشار لبعض الأنواع -->
+                <circle class="pin" cx="1010" cy="420" r="6"><title>البطريق الإمبراطوري</title></circle>
+                <circle class="pin" cx="560" cy="370" r="6"><title>البطريق همبولت</title></circle>
+                <circle class="pin" cx="930" cy="410" r="6"><title>البطريق ليتل بلو</title></circle>
+                <circle class="pin" cx="760" cy="390" r="6"><title>البطريق آديلي</title></circle>
+                <circle class="pin" cx="860" cy="450" r="6"><title>البطريق زنجباري (مؤيّد)</title></circle>
+              </svg>
+            </section>
+            <section id="panel-quiz" role="tabpanel" hidden>
+              <div id="quiz"></div>
+              <div class="bar" style="margin-top:12px">
+                <button class="btn brand" id="checkQuiz">تحقق من الإجابات</button>
+                <button class="btn" id="regenQuiz">سؤال جديد</button>
+              </div>
+              <div id="quizResult" class="muted" style="margin-top:8px"></div>
+            </section>
+          </div>
+        </div>
+      </div>
+      <aside class="col-4">
+        <div class="card pad">
+          <h3 class="section-title">حول المشروع</h3>
+          <p class="muted">هذا الموقع أحادي الملف (HTML + CSS + JS) مصمم لعرض قائمة كاملة من أنواع البطاريق المعروفة، مع صور SVG مولدة برمجياً، ومعلومات عن الحجم والوزن والحِمية وحالة الحفظ. أضفنا أيضاً نوعاً خيالياً بطابع طريف: <b>البطريق الزنجباري (مؤيّد)</b> المميز بلونه الدافئ وإعجابه بالزنجبيل 🍵.</p>
+          <ul class="muted">
+            <li>بحث فوري + تصفية متعددة.</li>
+            <li>جدول قابل للفرز.</li>
+            <li>خريطة SVG تفاعلية (تقريبية).</li>
+            <li>اختبار عشوائي بمستويات مختلفة.</li>
+            <li>حفظ مفضلاتك محلياً.</li>
+            <li>وضع ليلي/نهاري.</li>
+          </ul>
+        </div>
+        <div class="card pad" style="margin-top:18px">
+          <h3 class="section-title">مخطط بسيط: متوسط الطول</h3>
+          <svg id="chartH" class="chart" viewBox="0 0 600 180" aria-label="مخطط الأعمدة"></svg>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <dialog id="dlg" class="modal">
+    <div class="sheet">
+      <header>
+        <strong id="dlgTitle">—</strong>
+        <button id="closeDlg" class="btn">إغلاق</button>
+      </header>
+      <div class="content">
+        <div>
+          <div id="dlgImg" class="thumb" style="height:240px"></div>
+          <div class="bar" style="margin-top:8px">
+            <button class="btn brand" id="favBtn">⭐ أضِف إلى المفضلة</button>
+            <button class="btn" id="speakBtn">🔊 استمع للوصف</button>
+          </div>
+        </div>
+        <div>
+          <table id="dlgTbl"></table>
+          <p class="muted" id="dlgDesc">—</p>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <button id="toTop" class="btn to-top">⬆️ للأعلى</button>
+
+  <script>
+  // =======================
+  // بيانات الأنواع (18+1)
+  // =======================
+  const SPECIES = [
+    { id: 'emperor', name:'الإمبراطوري', latin:'Aptenodytes forsteri', size:'كبير', height_cm:115, weight_kg:35, region:'أنتاركتيكا', diet:'أسماك، كريل', status:'مهدد منخفض', color:'#9dd1ff', desc:'أكبر أنواع البطاريق، يعيش في مستعمرات ضخمة ويقطع مسافات طويلة فوق الجليد.' },
+    { id: 'king', name:'الملكي', latin:'Aptenodytes patagonicus', size:'كبير', height_cm:95, weight_kg:17, region:'أنتاركتيكا/جزر', diet:'أسماك، كريل', status:'غير مهدد', color:'#ffd166', desc:'يشبه الإمبراطوري لكن أصغر، بقع صفراء زاهية حول العنق.' },
+    { id: 'adelie', name:'آديلي', latin:'Pygoscelis adeliae', size:'متوسط', height_cm:70, weight_kg:5, region:'أنتاركتيكا', diet:'كريل', status:'غير مهدد', color:'#e0fbfc', desc:'عينان بارزتان وحلقة بيضاء؛ سبّاح نشيط.' },
+    { id: 'chinstrap', name:'ذو العِصابة', latin:'Pygoscelis antarcticus', size:'متوسط', height_cm:68, weight_kg:4, region:'أنتاركتيكا', diet:'كريل', status:'غير مهدد', color:'#caffbf', desc:'شريط أسود تحت الذقن كالعصابة.' },
+    { id: 'gentoo', name:'جنتو', latin:'Pygoscelis papua', size:'متوسط', height_cm:75, weight_kg:5.5, region:'أنتاركتيكا/جزر', diet:'أسماك، كريل', status:'قريب من التهديد', color:'#ffd6a5', desc:'من الأسرع تحت الماء؛ منقار برتقالي لامع.' },
+    { id: 'humboldt', name:'همبولت', latin:'Spheniscus humboldti', size:'متوسط', height_cm:70, weight_kg:4.5, region:'أمريكا الجنوبية', diet:'أسماك', status:'مهدد', color:'#ffc6ff', desc:'يسكن سواحل بيرو وتشيلي ويتأثر بظاهرة النينيو.' },
+    { id: 'magellanic', name:'ماغلاني', latin:'Spheniscus magellanicus', size:'متوسط', height_cm:70, weight_kg:5, region:'أمريكا الجنوبية', diet:'أسماك', status:'قريب من التهديد', color:'#bdb2ff', desc:'حلقات سوداء بيضاء مميزة على الصدر.' },
+    { id: 'galapagos', name:'غلاپاغوس', latin:'Spheniscus mendiculus', size:'صغير', height_cm:49, weight_kg:2.5, region:'أمريكا الجنوبية/غلاپاغوس', diet:'أسماك', status:'مهدد بشدة', color:'#ffadad', desc:'النوع الاستوائي الوحيد؛ يعتمد على تيار هومبولت البارد.' },
+    { id: 'african', name:'الأفريقي', latin:'Spheniscus demersus', size:'متوسط', height_cm:60, weight_kg:3, region:'أفريقيا', diet:'أسماك', status:'مهدد', color:'#ffdbe0', desc:'يُسمى أيضاً بطريق الحمار لصوته المميز.' },
+    { id: 'little', name:'الصغير الأزرق', latin:'Eudyptula minor', size:'صغير', height_cm:33, weight_kg:1.2, region:'أوقيانوسيا', diet:'أسماك', status:'غير مهدد', color:'#a0c4ff', desc:'أصغر أنواع البطاريق لونُه أزرق باهت.' },
+    { id: 'fiordland', name:'فيوردلاند', latin:'Eudyptes pachyrhynchus', size:'متوسط', height_cm:55, weight_kg:3.5, region:'أوقيانوسيا/نيوزيلندا', diet:'أسماك، كريل', status:'مهدد', color:'#d0f4de', desc:'خصال صفراء فوق العينين مثل الحواجب.' },
+    { id: 'snares', name:'سنيرز', latin:'Eudyptes robustus', size:'متوسط', height_cm:60, weight_kg:3.8, region:'أوقيانوسيا/نيوزيلندا', diet:'كريل', status:'قريب من التهديد', color:'#caf0f8', desc:'عرف أصفر بارز؛ مستعمرات كثيفة.' },
+    { id: 'erect', name:'ذو العرف المنتصب', latin:'Eudyptes sclateri', size:'متوسط', height_cm:58, weight_kg:3.7, region:'أوقيانوسيا', diet:'كريل', status:'مهدد', color:'#f1faee', desc:'سوالف صفراء قائمة إلى الأعلى.' },
+    { id: 'rockhopper', name:'روكهوبر', latin:'Eudyptes chrysocome', size:'صغير', height_cm:52, weight_kg:2.8, region:'أنتاركتيكا/جزر', diet:'كريل', status:'مهدد', color:'#e9ff70', desc:'قفزات صخرية سريعة وريش أصفر حول العين.' },
+    { id: 'macaroni', name:'ماكاروني', latin:'Eudyptes chrysolophus', size:'متوسط', height_cm:69, weight_kg:5.5, region:'أنتاركتيكا/جزر', diet:'كريل', status:'مهدد', color:'#ffe066', desc:'عرف أصفر كثيف مثل المعكرونة الإيطالية ⭐.' },
+    { id: 'royal', name:'رويال', latin:'Eudyptes schlegeli', size:'متوسط', height_cm:70, weight_kg:5.5, region:'أنتاركتيكا/جزر', diet:'كريل', status:'قريب من التهديد', color:'#ffd166', desc:'يشبه ماكاروني لكن الاختلافات جينية وموقعية.' },
+    { id: 'yellow', name:'صفراء العينين', latin:'Megadyptes antipodes', size:'متوسط', height_cm:65, weight_kg:5, region:'أوقيانوسيا/نيوزيلندا', diet:'أسماك', status:'مهدد بشدة', color:'#fff3b0', desc:'عيون صفراء لامعة وخدود شاحبة.' },
+    { id: 'gentle', name:'سنياري', latin:'Eudyptes moseleyi', size:'متوسط', height_cm:60, weight_kg:3.9, region:'أوقيانوسيا/جزر تريستان', diet:'كريل', status:'مهدد بشدة', color:'#cdeac0', desc:'يسمى أيضاً Northern rockhopper.' },
+    // النوع الخيالي المطلوب
+    { id: 'zanzibari', name:'الزنجباري (مؤيّد)', latin:'Spheniscus zingiberi (خيالي)', size:'متوسط', height_cm:62, weight_kg:3.2, region:'المحيط الهندي', diet:'أسماك، روبيان، جذور الزنجبيل البحرية', status:'غير موصّف', color:'#ffb4a2', desc:'بطريق خيالي من جزر زنجبار يحب رائحة الزنجبيل ويتميز برقعة صدرية دافئة اللون وفضولٍ كبير.' }
+  ];
+
+  // ===============
+  // أدوات مساعدة
+  // ===============
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  const fmt = n => new Intl.NumberFormat('ar-EG').format(n);
+
+  function svgPenguin(color='#9dd1ff'){ // صورة SVG مولّدة
+    return `
+    <svg viewBox="0 0 180 180" width="100%" height="100%" role="img" aria-label="رسم بطريق">
+      <defs>
+        <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#0b1a2c"/>
+          <stop offset="1" stop-color="#203a5e"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="180" height="180" rx="16" fill="url(#g1)"/>
+      <g transform="translate(90,100)">
+        <ellipse cx="0" cy="36" rx="26" ry="14" fill="#141e30" opacity=".6"/>
+      </g>
+      <g transform="translate(90,84)">
+        <path d="M0-52 c28 0 40 22 38 44 s-14 40-38 40 -38-18-38-40 10-44 38-44z" fill="#111" stroke="#000" stroke-width="1"/>
+        <circle cx="-10" cy="-18" r="6" fill="#fff"/>
+        <circle cx="10" cy="-18" r="6" fill="#fff"/>
+        <circle cx="-10" cy="-18" r="2" fill="#000"/>
+        <circle cx="10" cy="-18" r="2" fill="#000"/>
+        <path d="M-8 -10 l8 -4 l8 4 l-8 6z" fill="#ffb703"/>
+        <path d="M0 24 c24 0 26-28 22-40 c-4 12-10 14-22 14s-18-2-22-14c-4 12-2 40 22 40z" fill="${color}"/>
+        <path d="M-44 -12 c-10 10 -14 36 6 50 c6 4 10 4 16 2 c-10 -10 -12 -28 -10 -44z" fill="#0f1e33" opacity=".8"/>
+        <path d="M44 -12 c10 10 14 36 -6 50 c-6 4 -10 4 -16 2 c10 -10 12 -28 10 -44z" fill="#0f1e33" opacity=".8"/>
+      </g>
+    </svg>`;
+  }
+
+  // رسم عمود بسيط داخل SVG
+  function drawBar(svg, x, h, label){
+    const yBase = 160; const w = 18; const y = yBase - h;
+    svg.insertAdjacentHTML('beforeend', `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="#6cc4ff" />`);
+    svg.insertAdjacentHTML('beforeend', `<text x="${x + w/2}" y="170" font-size="10" text-anchor="middle" fill="#d0d6ea">${label}</text>`);
+  }
+
+  // بناء بطاقة نوع
+  function speciesCard(s){
+    const favs = getFavs();
+    const fav = favs.includes(s.id);
+    return `
+      <article class="species-card card">
+        <div class="thumb">${svgPenguin(s.color)}</div>
+        <div class="pad" style="padding:12px 14px">
+          <header style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <div>
+              <h3 style="margin:0">${s.name}</h3>
+              <div class="muted" style="font-size:12px">${s.latin}</div>
+            </div>
+            <button class="btn" data-open="${s.id}">${fav? '⭐' : '☆'}</button>
+          </header>
+          <div class="tags" style="margin-top:10px">
+            <span class="chip"><span class="dot" style="background:#9ae6b4"></span>${s.size}</span>
+            <span class="chip"><span class="dot" style="background:#93c5fd"></span>${s.region}</span>
+            <span class="chip"><span class="dot" style="background:#fda4af"></span>${s.status}</span>
+          </div>
+        </div>
+      </article>`;
+  }
+
+  // جدول
+  function buildTable(data){
+    const headers = [
+      {k:'name', t:'الاسم'},
+      {k:'latin', t:'الاسم العلمي'},
+      {k:'region', t:'المنطقة'},
+      {k:'size', t:'الحجم'},
+      {k:'height_cm', t:'الطول (سم)'},
+      {k:'weight_kg', t:'الوزن (كجم)'},
+      {k:'status', t:'الحفظ'}
+    ];
+    const thead = `<thead><tr>${headers.map(h=>`<th data-k="${h.k}">${h.t}</th>`).join('')}</tr></thead>`;
+    const rows = data.map(s=>`<tr>
+      <td>${s.name}</td>
+      <td class="muted">${s.latin}</td>
+      <td>${s.region}</td>
+      <td>${s.size}</td>
+      <td>${fmt(s.height_cm)}</td>
+      <td>${fmt(s.weight_kg)}</td>
+      <td>${s.status}</td>
+    </tr>`).join('');
+    $('#tbl').innerHTML = thead + `<tbody>${rows}</tbody>`;
+
+    // فرز
+    $('#tbl').onclick = (e)=>{
+      const th = e.target.closest('th'); if(!th) return;
+      const k = th.dataset.k; const asc = th.dataset.asc !== 'true';
+      const sorted = [...data].sort((a,b)=> (a[k] > b[k]? 1 : a[k] < b[k]? -1 : 0) * (asc? 1 : -1));
+      th.dataset.asc = asc;
+      buildTable(sorted);
+    };
+  }
+
+  // نافذة التفاصيل
+  function openDetails(id){
+    const s = SPECIES.find(x=>x.id===id);
+    if(!s) return;
+    $('#dlgTitle').textContent = `${s.name} — ${s.latin}`;
+    $('#dlgImg').innerHTML = svgPenguin(s.color);
+    $('#dlgDesc').textContent = s.desc;
+    $('#dlgTbl').innerHTML = `
+      <tr><th>الحجم</th><td>${s.size}</td></tr>
+      <tr><th>الطول</th><td>${fmt(s.height_cm)} سم</td></tr>
+      <tr><th>الوزن</th><td>${fmt(s.weight_kg)} كجم</td></tr>
+      <tr><th>الموطن</th><td>${s.region}</td></tr>
+      <tr><th>الحِمية</th><td>${s.diet}</td></tr>
+      <tr><th>حالة الحفظ</th><td>${s.status}</td></tr>
+    `;
+    $('#favBtn').onclick = ()=>toggleFav(s.id);
+    $('#speakBtn').onclick = ()=> speak(`${s.name}. ${s.desc}`);
+    $('#dlg').showModal();
+  }
+
+  // مفضلات محلية
+  function getFavs(){ try{ return JSON.parse(localStorage.getItem('p_favs')||'[]'); } catch{ return []; } }
+  function toggleFav(id){
+    const favs = getFavs();
+    const i = favs.indexOf(id);
+    if(i>-1) favs.splice(i,1); else favs.push(id);
+    localStorage.setItem('p_favs', JSON.stringify(favs));
+    render();
+  }
+
+  // بحث + تصفية
+  function filterAll(){
+    const q = ($('#q').value||'').trim().toLowerCase();
+    const r = $('#filterRegion').value;
+    const sz = $('#filterSize').value;
+    let out = SPECIES.filter(s=>
+      (!r || s.region.includes(r)) &&
+      (!sz || s.size===sz) &&
+      (!q || [s.name, s.latin, s.region, s.diet, s.status].join(' ').toLowerCase().includes(q))
+    );
+    $('#chipSearch').textContent = q? `"${q}"` : '—';
+    $('#chipFilter').textContent = [r, sz].filter(Boolean).join(' + ') || 'لا يوجد';
+    return out;
+  }
+
+  // رسم المخطط (متوسط الطول لكل فئة حجم)
+  function drawChart(){
+    const svg = $('#chartH'); svg.innerHTML = '';
+    const groups = {
+      'صغير': SPECIES.filter(s=>s.size==='صغير'),
+      'متوسط': SPECIES.filter(s=>s.size==='متوسط'),
+      'كبير': SPECIES.filter(s=>s.size==='كبير')
+    };
+    const av = k => Math.round(groups[k].reduce((a,c)=>a+c.height_cm,0)/groups[k].length);
+    const vals = ['صغير','متوسط','كبير'].map(g=>({g, v: av(g)}));
+    const max = Math.max(...vals.map(x=>x.v));
+    const scale = n => Math.round((n/max)*120)+10;
+    let x=60;
+    vals.forEach(({g,v})=>{ drawBar(svg, x, scale(v), g); x+=80; });
+  }
+
+  // بناء أسئلة سريعة
+  function buildQuiz(){
+    const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+    const q1S = pick(SPECIES);
+    const q2S = pick(SPECIES);
+    const q3S = pick(SPECIES);
+    const html = `
+      <div class="quiz-q" data-ans="${q1S.size}">
+        <h4>١) ما حجم <b>${q1S.name}</b>؟</h4>
+        <div class="bar">
+          ${['صغير','متوسط','كبير'].map(x=>`<label><input type="radio" name="q1" value="${x}"> ${x}</label>`).join(' ')}
+        </div>
+      </div>
+      <div class="quiz-q" data-ans="${q2S.region}">
+        <h4>٢) أين ينتشر <b>${q2S.name}</b> غالباً؟</h4>
+        <div class="bar">
+          ${['أنتاركتيكا','أوقيانوسيا','أمريكا الجنوبية','أفريقيا','المحيط الهندي'].map(x=>`<label><input type="radio" name="q2" value="${x}"> ${x}</label>`).join(' ')}
+        </div>
+      </div>
+      <div class="quiz-q" data-ans="${q3S.diet}">
+        <h4>٣) ما غذاء <b>${q3S.name}</b> الأساسي؟</h4>
+        <input class="input" name="q3" placeholder="اكتب مثالاً (أسماك/كريل/روبيان…)"/>
+      </div>
+    `;
+    $('#quiz').innerHTML = html;
+  }
+
+  function checkQuiz(){
+    let score = 0; let total = 3;
+    const q1 = $$('#quiz .quiz-q')[0];
+    const v1 = (q1.querySelector('input:checked')||{}).value;
+    if(v1===q1.dataset.ans) score++;
+    const q2 = $$('#quiz .quiz-q')[1];
+    const v2 = (q2.querySelector('input:checked')||{}).value;
+    if((q2.dataset.ans||'').includes(v2)) score++;
+    const q3 = $$('#quiz .quiz-q')[2];
+    const v3 = (q3.querySelector('input')||{}).value||'';
+    if((q3.dataset.ans||'').includes(v3.trim())) score++;
+    $('#quizResult').textContent = `نتيجتك: ${score} / ${total}`;
+  }
+
+  // نطق
+  function speak(text){
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'ar';
+    speechSynthesis.speak(u);
+  }
+
+  // تبويبات
+  function setupTabs(){
+    const tabs = $$('.tab');
+    tabs.forEach(t=> t.addEventListener('click', ()=>{
+      tabs.forEach(x=>x.setAttribute('aria-selected','false'));
+      t.setAttribute('aria-selected','true');
+      const id = t.dataset.tab;
+      $$('#panels > section').forEach(p=> p.hidden = true);
+      $('#panel-'+id).hidden = false;
+    }));
+  }
+
+  // رسم واجهة المعرض والعدادات
+  function render(){
+    const data = filterAll();
+    $('#grid').innerHTML = data.map(speciesCard).join('');
+    $('#kTotal').textContent = SPECIES.length;
+    $('#kThreat').textContent = SPECIES.filter(s=> s.status.includes('مهدد')).length;
+    $('#kAvgH').textContent = fmt(Math.round(SPECIES.reduce((a,c)=>a+c.height_cm,0)/SPECIES.length)) + ' سم';
+    $('#kAvgW').textContent = fmt((SPECIES.reduce((a,c)=>a+c.weight_kg,0)/SPECIES.length).toFixed(1)) + ' كجم';
+    $('#chipCount').textContent = `${data.length} نوع`;
+
+    // فتح التفاصيل
+    $$('#grid [data-open]').forEach(btn=> btn.onclick = ()=> openDetails(btn.dataset.open));
+
+    // بناء الجدول
+    buildTable(data);
+  }
+
+  // تنزيل البيانات
+  function download(filename, text){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], {type:'application/json'}));
+    a.download = filename; a.click();
+  }
+
+  // وضع ليلي/نهاري بسيط بتغيير الخلفية
+  function toggleTheme(){
+    const pressed = $('#themeBtn').getAttribute('aria-pressed') === 'true';
+    $('#themeBtn').setAttribute('aria-pressed', String(!pressed));
+    if(pressed){
+      document.documentElement.style.setProperty('--bg', '#0b1320');
+      document.documentElement.style.setProperty('--panel', '#121a2b');
+      document.documentElement.style.setProperty('--panel-2', '#0f1626');
+      document.documentElement.style.setProperty('--text', '#f2f5ff');
+    } else {
+      document.documentElement.style.setProperty('--bg', '#f6fbff');
+      document.documentElement.style.setProperty('--panel', '#ffffff');
+      document.documentElement.style.setProperty('--panel-2', '#f2f6fb');
+      document.documentElement.style.setProperty('--text', '#0b1320');
+    }
+  }
+
+  // زر للأعلى
+  function setupToTop(){
+    const btn = $('#toTop');
+    window.addEventListener('scroll', ()=>{
+      if(window.scrollY > 300) btn.classList.add('show'); else btn.classList.remove('show');
+    });
+    btn.onclick = ()=> window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  // أحداث رئيسية
+  window.addEventListener('DOMContentLoaded', ()=>{
+    setupTabs();
+    drawChart();
+    render();
+    buildQuiz();
+    setupToTop();
+
+    // تفاعلات البحث والتصفية
+    ['q','filterRegion','filterSize'].forEach(id=> $("#"+id).addEventListener('input', ()=> render()));
+
+    // إغلاق النافذة
+    $('#closeDlg').onclick = ()=> $('#dlg').close();
+
+    // تنزيل JSON
+    $('#downloadJson').onclick = ()=> download('penguins.json', JSON.stringify(SPECIES, null, 2));
+
+    // تبديل السمة
+    $('#themeBtn').onclick = toggleTheme;
+
+    // اختبار
+    $('#checkQuiz').onclick = checkQuiz;
+    $('#regenQuiz').onclick = buildQuiz;
+
+    // مفاتيح
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='Escape' && $('#dlg').open) $('#dlg').close();
+      if(e.key==='/' && document.activeElement.tagName!=='INPUT') { e.preventDefault(); $('#q').focus(); }
+    });
+  });
+  </script>
+</body>
+</html>
